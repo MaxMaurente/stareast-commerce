@@ -35,5 +35,8 @@ jobs:
             sleep 2
           done
 
-      - name: Run tests
+      - name: Run API tests
         run: npm test
+
+      - name: Run load tests (k6)
+        run: npm run test:load:login
