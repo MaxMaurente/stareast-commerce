@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: Stareast Commerce API
+  version: 1.0.0
+  description: Simple in-memory e-commerce API with JWT authentication.
+servers:
+  - url: http://localhost:3000
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "201":
+          description: User created
+        "409":
+          description: User already exists
+  /login:
+    post:
+      summary: Login and receive JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login successful
+        "401":
+          description: Invalid credentials
+  /checkout:
+    post:
+      summary: Checkout cart (requires JWT)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items, paymentMethod]
+              properties:
+                paymentMethod:
+                  type: string
+                  enum: [cash, credit_card]
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [productId, quantity]
+                    properties:
+                      productId:
+                        type: integer
+                      quantity:
+                        type: integer
+      responses:
+        "200":
+          description: Checkout calculated
+        "400":
+          description: Validation error
+        "401":
+          description: Missing or invalid token
+  /healthcheck:
+    get:
+      summary: Healthcheck endpoint
+      responses:
+        "200":
+          description: API is healthy
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
